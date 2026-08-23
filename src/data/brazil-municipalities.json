@@ -1,0 +1,159 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "São Paulo",
+        "state": "SP",
+        "intensity": 0.95,
+        "riskLevel": "Muito alto",
+        "center": [-23.55, -46.63]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-46.76, -23.62], [-46.58, -23.72], [-46.50, -23.58], [-46.55, -23.42], [-46.73, -23.40], [-46.76, -23.62]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rio de Janeiro",
+        "state": "RJ",
+        "intensity": 0.88,
+        "riskLevel": "Muito alto",
+        "center": [-22.91, -43.17]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-43.35, -22.99], [-43.10, -23.09], [-42.95, -22.87], [-43.04, -22.70], [-43.28, -22.78], [-43.35, -22.99]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Belo Horizonte",
+        "state": "MG",
+        "intensity": 0.74,
+        "riskLevel": "Alto",
+        "center": [-19.92, -43.93]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-44.08, -20.04], [-43.90, -20.12], [-43.78, -19.90], [-43.95, -19.74], [-44.12, -19.84], [-44.08, -20.04]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Salvador",
+        "state": "BA",
+        "intensity": 0.68,
+        "riskLevel": "Alto",
+        "center": [-12.98, -38.50]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-38.66, -13.08], [-38.44, -13.18], [-38.34, -12.92], [-38.50, -12.76], [-38.68, -12.86], [-38.66, -13.08]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Recife",
+        "state": "PE",
+        "intensity": 0.59,
+        "riskLevel": "Médio",
+        "center": [-8.05, -34.88]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-34.98, -8.14], [-34.82, -8.24], [-34.74, -8.02], [-34.86, -7.92], [-35.00, -8.02], [-34.98, -8.14]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fortaleza",
+        "state": "CE",
+        "intensity": 0.54,
+        "riskLevel": "Médio",
+        "center": [-3.72, -38.54]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-38.69, -3.84], [-38.52, -3.90], [-38.42, -3.68], [-38.55, -3.56], [-38.72, -3.64], [-38.69, -3.84]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Curitiba",
+        "state": "PR",
+        "intensity": 0.49,
+        "riskLevel": "Médio",
+        "center": [-25.43, -49.27]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-49.41, -25.55], [-49.22, -25.60], [-49.12, -25.38], [-49.28, -25.26], [-49.43, -25.33], [-49.41, -25.55]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Porto Alegre",
+        "state": "RS",
+        "intensity": 0.42,
+        "riskLevel": "Baixo",
+        "center": [-30.03, -51.22]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-51.34, -30.16], [-51.18, -30.24], [-51.06, -30.00], [-51.18, -29.86], [-51.34, -29.95], [-51.34, -30.16]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Manaus",
+        "state": "AM",
+        "intensity": 0.31,
+        "riskLevel": "Baixo",
+        "center": [-3.12, -60.02]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-60.20, -3.26], [-59.94, -3.30], [-59.86, -3.06], [-60.06, -2.94], [-60.20, -3.04], [-60.20, -3.26]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Brasília",
+        "state": "DF",
+        "intensity": 0.18,
+        "riskLevel": "Muito baixo",
+        "center": [-15.79, -47.88]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-48.00, -15.92], [-47.78, -15.98], [-47.72, -15.74], [-47.90, -15.62], [-48.02, -15.72], [-48.00, -15.92]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Campo Grande",
+        "state": "MS",
+        "intensity": null,
+        "riskLevel": "Sem dados",
+        "center": [-20.47, -54.62]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-54.74, -20.58], [-54.58, -20.64], [-54.46, -20.42], [-54.60, -20.30], [-54.76, -20.36], [-54.74, -20.58]]]
+      }
+    }
+  ]
+}
