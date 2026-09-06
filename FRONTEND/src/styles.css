@@ -1,0 +1,449 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #f5f7fb;
+  background: linear-gradient(135deg, #07131f 0%, #11253f 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(8, 16, 28, 0.8);
+  backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+  color: #74c0fc;
+  margin-bottom: 8px;
+}
+
+.filters-bar {
+  border-radius: 20px;
+  background: rgba(8, 16, 28, 0.85);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.filters-bar h2 {
+  margin-top: 0;
+}
+
+.map-section {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.charts-section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.panel-info,
+.map-card {
+  border-radius: 20px;
+  background: rgba(8, 16, 28, 0.85);
+  padding: 20px;
+}
+
+.map-wrapper {
+  position: relative;
+}
+
+.map-view {
+  height: min(78vh, 820px);
+  min-height: 560px;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.legend {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  background: rgba(7, 16, 28, 0.9);
+  color: #f5f7fb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.legend-title {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.legend-scale {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.legend-color {
+  width: 28px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.legend-color.very-low {
+  background: #ffcdd2;
+}
+
+.legend-color.low {
+  background: #ef9a9a;
+}
+
+.legend-color.medium {
+  background: #e53935;
+}
+
+.legend-color.high {
+  background: #b71c1c;
+}
+
+.legend-color.very-high {
+  background: #7f0000;
+}
+
+.legend-color.no-data {
+  background: #9aa4b2;
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.72rem;
+  opacity: 0.9;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 16, 28, 0.65);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  color: #74c0fc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+.zoom-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(7, 16, 28, 0.82);
+  color: #a8c8f0;
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.active-filters-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  max-width: 60%;
+  background: rgba(7, 16, 28, 0.9);
+  color: #74c0fc;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.leaflet-tooltip.crime-tooltip {
+  background: rgba(7, 16, 28, 0.95);
+  color: #f5f7fb;
+  border: 1px solid rgba(116, 192, 253, 0.35);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.leaflet-tooltip.crime-tooltip.leaflet-tooltip-top::before {
+  border-top-color: rgba(7, 16, 28, 0.95);
+}
+
+.leaflet-tooltip.crime-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: rgba(7, 16, 28, 0.95);
+}
+
+.leaflet-tooltip.crime-tooltip.leaflet-tooltip-left::before {
+  border-left-color: rgba(7, 16, 28, 0.95);
+}
+
+.leaflet-tooltip.crime-tooltip.leaflet-tooltip-right::before {
+  border-right-color: rgba(7, 16, 28, 0.95);
+}
+
+.crime-tooltip-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.crime-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.crime-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.crime-tooltip-level {
+  font-weight: 600;
+}
+
+.crime-tooltip-total {
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.crime-tooltip-percentage,
+.crime-tooltip-homicide {
+  opacity: 0.85;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+.filter-field label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a8c8f0;
+}
+
+.filter-field select {
+  appearance: none;
+  background: rgba(7, 16, 28, 0.85);
+  color: #f5f7fb;
+  border: 1px solid rgba(116, 192, 252, 0.35);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.filter-field select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.multi-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+.multi-select label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a8c8f0;
+}
+
+.multi-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(7, 16, 28, 0.85);
+  color: #f5f7fb;
+  border: 1px solid rgba(116, 192, 252, 0.35);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.multi-select-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.multi-select-caret {
+  color: #74c0fc;
+  font-size: 0.75rem;
+}
+
+.multi-select-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #0b1a2b;
+  border: 1px solid rgba(116, 192, 252, 0.35);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.multi-select-option:hover {
+  background: rgba(116, 192, 252, 0.12);
+}
+
+.multi-select-empty {
+  color: #a8c8f0;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  margin: 0;
+}
+
+.multi-select-clear {
+  margin-top: 4px;
+  background: none;
+  border: none;
+  color: #ff6b35;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
+.filter-error {
+  color: #ff6b35;
+  font-size: 0.8rem;
+  margin-top: -4px;
+  margin-bottom: 16px;
+}
+
+.charts-panel {
+  width: 100%;
+  border-radius: 20px;
+  background: rgba(8, 16, 28, 0.85);
+  padding: 20px;
+}
+
+.charts-summary {
+  font-weight: 600;
+  color: #74c0fc;
+  margin-bottom: 16px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.chart-card h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+
+.chart-canvas {
+  position: relative;
+  height: 260px;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #a8c8f0;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
+
+/* Browsers draw a focus rectangle around clicked vector layers by default */
+.leaflet-interactive:focus {
+  outline: none;
+}
+
+@media (max-width: 900px) {
+  .filter-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
