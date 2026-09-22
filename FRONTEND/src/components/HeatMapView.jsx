@@ -113,6 +113,13 @@ function ZoomWatcher({ onChange }) {
   return null;
 }
 
+function BaseLayerWatcher({ onChange }) {
+  useMapEvents({
+    baselayerchange: (event) => onChange(event.name),
+  });
+  return null;
+}
+
 /** Reports which municipality (if any) currently sits under the map's center. */
 function CityWatcher({ municipalityFeatures, onChange }) {
   const map = useMap();
@@ -303,7 +310,14 @@ function SelectionHighlight({ selectedFeatures }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-function HeatMapView({ filters = {}, activeFilterLabels = [], onSelectMunicipality, onSelectNeighborhood }) {
+function HeatMapView({
+  filters = {},
+  activeFilterLabels = [],
+  selectedBaseLayer = 'Mapa Claro',
+  onBaseLayerChange,
+  onSelectMunicipality,
+  onSelectNeighborhood,
+}) {
   const [municipalitiesGeo, setMunicipalitiesGeo] = useState(null);
   const [neighborhoodsGeo, setNeighborhoodsGeo]    = useState(null);
   const [loading, setLoading]                      = useState(true);
@@ -497,22 +511,14 @@ function HeatMapView({ filters = {}, activeFilterLabels = [], onSelectMunicipali
     <div className="map-wrapper">
       {/* ── Legend ── */}
       <div className="legend" aria-label="Legenda de intensidade">
-        <span className="legend-title">Nível de risco</span>
-        <div className="legend-scale">
-          <span className="legend-color very-low"  />
-          <span className="legend-color low"        />
-          <span className="legend-color medium"     />
-          <span className="legend-color high"       />
-          <span className="legend-color very-high"  />
-          <span className="legend-color no-data"    />
-        </div>
-        <div className="legend-labels">
-          <span>Muito baixo</span>
-          <span>Baixo</span>
-          <span>Médio</span>
-          <span>Alto</span>
-          <span>Muito alto</span>
-          <span>Sem dados</span>
+        <span className="legend-title">Níveis de risco</span>
+        <div className="legend-items">
+          <span className="legend-item"><span className="legend-color very-low" /><span>Muito baixo</span></span>
+          <span className="legend-item"><span className="legend-color low" /><span>Baixo</span></span>
+          <span className="legend-item"><span className="legend-color medium" /><span>Médio</span></span>
+          <span className="legend-item"><span className="legend-color high" /><span>Alto</span></span>
+          <span className="legend-item"><span className="legend-color very-high" /><span>Muito alto</span></span>
+          <span className="legend-item"><span className="legend-color no-data" /><span>Sem dados</span></span>
         </div>
       </div>
 
@@ -543,13 +549,13 @@ function HeatMapView({ filters = {}, activeFilterLabels = [], onSelectMunicipali
           className="map-view"
         >
           <LayersControl position="topright">
-            <BaseLayer checked name="Mapa Claro">
+            <BaseLayer checked={selectedBaseLayer === 'Mapa Claro'} name="Mapa Claro">
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
             </BaseLayer>
-            <BaseLayer name="Mapa Escuro">
+            <BaseLayer checked={selectedBaseLayer === 'Mapa Escuro'} name="Mapa Escuro">
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -557,13 +563,15 @@ function HeatMapView({ filters = {}, activeFilterLabels = [], onSelectMunicipali
                 maxZoom={20}
               />
             </BaseLayer>
-            <BaseLayer name="Satélite">
+            <BaseLayer checked={selectedBaseLayer === 'Satélite'} name="Satélite">
               <TileLayer
                 attribution='Tiles &copy; Esri'
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               />
             </BaseLayer>
           </LayersControl>
+
+          <BaseLayerWatcher onChange={onBaseLayerChange} />
 
           <RegionLock bounds={regionBounds} />
           <FocusMunicipality

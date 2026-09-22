@@ -52,6 +52,11 @@ function MultiSelectDropdown({ id, label, placeholder, options, values, disabled
 
       {open && (
         <div className="multi-select-panel" role="listbox">
+          {values.length > 0 && (
+            <button type="button" className="multi-select-clear" onClick={() => onChange([])}>
+              Limpar seleção
+            </button>
+          )}
           {options.length === 0 && <p className="multi-select-empty">Nenhuma opção disponível</p>}
           {options.map(({ value, label: optionLabel }) => {
             const stringValue = String(value);
@@ -68,7 +73,7 @@ function MultiSelectDropdown({ id, label, placeholder, options, values, disabled
             );
           })}
           {values.length > 0 && (
-            <button type="button" className="multi-select-clear" onClick={() => onChange([])}>
+            <button type="button" className="multi-select-clear multi-select-clear-bottom" onClick={() => onChange([])}>
               Limpar seleção
             </button>
           )}

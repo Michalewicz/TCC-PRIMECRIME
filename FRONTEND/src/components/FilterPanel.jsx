@@ -1,5 +1,8 @@
 import MultiSelectDropdown from './MultiSelectDropdown';
 
+const MIN_DATA_DATE = '1202-01-18T19:03';
+const MAX_DATA_DATE = '2026-06-30T21:12';
+
 function FilterPanel({
   options,
   filters,
@@ -73,7 +76,8 @@ function FilterPanel({
           type="datetime-local"
           value={startDate}
           disabled={disabled}
-          max={endDate || undefined}
+          min={MIN_DATA_DATE}
+          max={endDate || MAX_DATA_DATE}
           onChange={(e) => onStartDateChange(e.target.value)}
         />
       </div>
@@ -85,7 +89,8 @@ function FilterPanel({
           type="datetime-local"
           value={endDate}
           disabled={disabled}
-          min={startDate || undefined}
+          min={startDate || MIN_DATA_DATE}
+          max={MAX_DATA_DATE}
           onChange={(e) => onEndDateChange(e.target.value)}
         />
       </div>
