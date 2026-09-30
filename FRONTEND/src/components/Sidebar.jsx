@@ -1,8 +1,17 @@
-import { BarChart3, MapPinned, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, BarChart3, ClipboardList, MapPinned, Moon, Sun } from 'lucide-react';
 
-function Sidebar({ activePage, onPageChange, isDark, onToggleTheme }) {
+function Sidebar({ activePage, onPageChange, isDark, onToggleTheme, collapsed, onToggleCollapsed }) {
   return (
-    <aside className="sidebar" aria-label="Navegacao principal">
+    <aside className={`sidebar ${collapsed ? 'is-collapsed' : ''}`} aria-label="Navegacao principal">
+      <button
+        type="button"
+        className={`sidebar-collapse-toggle ${collapsed ? 'is-collapsed' : ''}`}
+        onClick={onToggleCollapsed}
+        aria-label={collapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'}
+      >
+        <ArrowLeft size={18} />
+      </button>
+
       <div className="sidebar-brand">
         <img className="brand-logo" src={isDark ? '/logo-light.png' : '/logo-dark.png'} alt="PrimeCrimes" />
         <span className="brand-mark-ring" />
@@ -31,7 +40,7 @@ function Sidebar({ activePage, onPageChange, isDark, onToggleTheme }) {
           aria-current={activePage === 'map' ? 'page' : undefined}
         >
           <span className="sidebar-link-icon" aria-hidden="true"><MapPinned size={17} strokeWidth={2.2} /></span>
-          <span>Mapa de Calor</span>
+          <span className="sidebar-link-label">Mapa de Calor</span>
         </button>
         <button
           type="button"
@@ -40,10 +49,18 @@ function Sidebar({ activePage, onPageChange, isDark, onToggleTheme }) {
           aria-current={activePage === 'charts' ? 'page' : undefined}
         >
           <span className="sidebar-link-icon" aria-hidden="true"><BarChart3 size={17} strokeWidth={2.2} /></span>
-          <span>Graficos</span>
+          <span className="sidebar-link-label">Graficos</span>
+        </button>
+        <button
+          type="button"
+          className={`sidebar-link ${activePage === 'details' ? 'is-active' : ''}`}
+          onClick={() => onPageChange('details')}
+          aria-current={activePage === 'details' ? 'page' : undefined}
+        >
+          <span className="sidebar-link-icon" aria-hidden="true"><ClipboardList size={17} strokeWidth={2.2} /></span>
+          <span className="sidebar-link-label">Detalhes</span>
         </button>
       </nav>
-
     </aside>
   );
 }

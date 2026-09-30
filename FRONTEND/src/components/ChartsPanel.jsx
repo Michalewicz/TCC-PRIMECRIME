@@ -26,11 +26,50 @@ ChartJS.register(
   ChartDataLabels
 );
 
-// Shared across bar and doughnut charts so the same category always gets the same color.
-const PALETTE = [
-  '#7c5cff', '#6f8cff', '#5f9dff', '#50adff', '#42bdf2',
-  '#8a63d8', '#756ed9', '#6485e6', '#579fe8', '#48b8df',
-];
+const CATEGORY_COLOR_CACHE = new Map();
+const occurrenceFormatter = new Intl.NumberFormat('pt-BR');
+
+function hslToHex(hue, saturation, lightness) {
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const section = hue / 60;
+  const second = chroma * (1 - Math.abs((section % 2) - 1));
+  const offset = lightness - chroma / 2;
+  const channels = section < 1 ? [chroma, second, 0]
+    : section < 2 ? [second, chroma, 0]
+      : section < 3 ? [0, chroma, second]
+        : section < 4 ? [0, second, chroma]
+          : section < 5 ? [second, 0, chroma]
+            : [chroma, 0, second];
+  return `#${channels.map((channel) => Math.round((channel + offset) * 255).toString(16).padStart(2, '0')).join('')}`;
+}
+
+function hexToRgb(hex) {
+  return [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16));
+}
+
+function categoryColor(existingColors) {
+  let bestColor = '#9852FF';
+  let bestDistance = -1;
+  const existingRgb = existingColors.map(hexToRgb);
+
+  for (let attempt = 0; attempt < 64; attempt += 1) {
+    const candidate = hslToHex(
+      183 + Math.random() * 82,
+      0.66 + Math.random() * 0.2,
+      0.49 + Math.random() * 0.13
+    );
+    const candidateRgb = hexToRgb(candidate);
+    const nearestDistance = existingRgb.length
+      ? Math.min(...existingRgb.map((color) => color.reduce((sum, channel, index) => sum + ((channel - candidateRgb[index]) ** 2), 0)))
+      : Infinity;
+
+    if (nearestDistance > bestDistance) {
+      bestColor = candidate;
+      bestDistance = nearestDistance;
+    }
+  }
+  return bestColor;
+}
 
 function percentageOf(value, dataArr) {
   const total = dataArr.reduce((sum, v) => sum + v, 0);
@@ -123,8 +162,14 @@ function createDoughnutOptions(theme) {
   };
 }
 
-function paletteColors(count) {
-  return Array.from({ length: count }, (_, i) => PALETTE[i % PALETTE.length]);
+function getCategoryColors(labels) {
+  return labels.map((label) => {
+    const key = String(label);
+    if (!CATEGORY_COLOR_CACHE.has(key)) {
+      CATEGORY_COLOR_CACHE.set(key, categoryColor([...CATEGORY_COLOR_CACHE.values()]));
+    }
+    return CATEGORY_COLOR_CACHE.get(key);
+  });
 }
 
 function buildCrimeTypeDoughnutOptions(values, theme) {
@@ -222,6 +267,8 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
   const locationTitle = locationChartTitle(filters);
   const chartTheme = getChartTheme(isDark);
   const baseOptions = createBaseOptions(chartTheme);
+  const totalCrimeTypeOccurrences = byCrimeType.reduce((sum, row) => sum + row.total, 0);
+  const totalLocationOccurrences = byLocation.reduce((sum, row) => sum + row.total, 0);
   const crimeTypeMax = Math.max(...byCrimeType.map((row) => row.total), 0);
   const crimeTypeOptions = {
     ...baseOptions,
@@ -274,7 +321,7 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
     labels: byCrimeType.map((row) => row.crime_type),
     datasets: [{
       data: byCrimeType.map((row) => row.total),
-      backgroundColor: paletteColors(byCrimeType.length),
+      backgroundColor: getCategoryColors(byCrimeType.map((row) => row.crime_type)),
     }],
   };
 
@@ -295,7 +342,7 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
     labels: byLocation.map((row) => row.name),
     datasets: [{
       data: byLocation.map((row) => row.total),
-      backgroundColor: paletteColors(byLocation.length),
+      backgroundColor: getCategoryColors(byLocation.map((row) => row.name)),
       barThickness: 24,
     }],
   };
@@ -304,7 +351,7 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
     labels: byCrimeType.map((row) => row.crime_type),
     datasets: [{
       data: byCrimeType.map((row) => Math.log10(row.total + 1)),
-      backgroundColor: paletteColors(byCrimeType.length),
+      backgroundColor: getCategoryColors(byCrimeType.map((row) => row.crime_type)),
       borderWidth: 0,
       hoverBorderWidth: 0,
     }],
@@ -314,7 +361,7 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
     labels: byLocation.map((row) => row.name),
     datasets: [{
       data: byLocation.map((row) => row.total),
-      backgroundColor: paletteColors(byLocation.length),
+      backgroundColor: getCategoryColors(byLocation.map((row) => row.name)),
       borderWidth: 0,
       hoverBorderWidth: 0,
     }],
@@ -328,7 +375,7 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
     datasets: [
       {
         data: homicideRateRows.map((row) => row.homicide_rate_per_100k),
-        backgroundColor: paletteColors(homicideRateRows.length),
+        backgroundColor: getCategoryColors(homicideRateRows.map((row) => row.name)),
         barThickness: 24,
       },
     ],
@@ -336,44 +383,60 @@ function ChartsPanel({ statistics, filters, isDark, loading, error }) {
 
   return (
     <div className="charts-panel" aria-label="Gráficos de ocorrências">
-      <div className="charts-summary">
-        {loading ? 'Carregando estatísticas…' : `Total de ocorrências: ${total}`}
+      <div className="charts-summary" aria-live="polite">
+        <h2>TOTAL DE OCORRÊNCIAS</h2>
+        <strong>{loading ? '…' : occurrenceFormatter.format(total)}</strong>
       </div>
       {error && <p className="filter-error">Não foi possível carregar as estatísticas do servidor.</p>}
 
-      <div className="charts-grid">
-        <ChartCard className="crime-type-chart" title="Ocorrências por tipo de crime" empty={!loading && byCrimeType.length === 0}>
-          <Bar data={crimeTypeData} options={crimeTypeOptions} />
-        </ChartCard>
+      <div className="charts-groups">
+        <section className="charts-group charts-group-doughnuts">
+          <div className="charts-grid">
+            <ChartCard className="doughnut-chart" title="Proporção por tipo de crime" empty={!loading && byCrimeType.length === 0}>
+              <Doughnut data={crimeTypeShareData} options={crimeTypeDoughnutOptions} />
+            </ChartCard>
+            {locationTitle && (
+              <ChartCard className="doughnut-chart" title={`Proporção ${locationTitle.replace('Ocorrências ', '')}`} empty={!loading && byLocation.length === 0}>
+                <Doughnut data={locationShareData} options={locationDoughnutOptions} />
+              </ChartCard>
+            )}
+          </div>
+          <div className="charts-group-total">
+            TOTAL DE OCORRÊNCIAS: {occurrenceFormatter.format(totalCrimeTypeOccurrences)}
+          </div>
+        </section>
 
-        <ChartCard className="doughnut-chart" title="Proporção por tipo de crime" empty={!loading && byCrimeType.length === 0}>
-          <Doughnut data={crimeTypeShareData} options={crimeTypeDoughnutOptions} />
-        </ChartCard>
+        <section className="charts-group charts-group-vertical">
+          <div className="charts-grid">
+            <ChartCard className="crime-type-chart" title="Ocorrências por tipo de crime" empty={!loading && byCrimeType.length === 0}>
+              <Bar data={crimeTypeData} options={crimeTypeOptions} />
+            </ChartCard>
+            <ChartCard className="month-chart" title="Ocorrências por mês" empty={!loading && byMonth.length === 0}>
+              <Line data={monthData} options={monthOptions} />
+            </ChartCard>
+          </div>
+          <div className="charts-group-total">
+            TOTAL DE OCORRÊNCIAS: {occurrenceFormatter.format(totalCrimeTypeOccurrences)}
+          </div>
+        </section>
 
-        <ChartCard className="month-chart" title="Ocorrências por mês" empty={!loading && byMonth.length === 0}>
-          <Line data={monthData} options={monthOptions} />
-        </ChartCard>
-
-        {locationTitle && (
-          <ChartCard title={locationTitle} empty={!loading && byLocation.length === 0}>
-            <Bar data={locationData} options={{ ...baseOptions, indexAxis: 'y' }} />
-          </ChartCard>
-        )}
-
-        {locationTitle && (
-          <ChartCard className="doughnut-chart" title={`Proporção ${locationTitle.replace('Ocorrências ', '')}`} empty={!loading && byLocation.length === 0}>
-            <Doughnut data={locationShareData} options={locationDoughnutOptions} />
-          </ChartCard>
-        )}
-
-        {locationTitle && (
-          <ChartCard
-            title="Taxa de homicídios por 100 mil habitantes"
-            empty={!loading && homicideRateRows.length === 0}
-          >
-            <Bar data={homicideRateData} options={rateBarOptions} />
-          </ChartCard>
-        )}
+        <section className="charts-group charts-group-other">
+          <div className="charts-grid">
+            {locationTitle && (
+              <ChartCard title={locationTitle} empty={!loading && byLocation.length === 0}>
+                <Bar data={locationData} options={{ ...baseOptions, indexAxis: 'y' }} />
+              </ChartCard>
+            )}
+            {locationTitle && (
+              <ChartCard title="Taxa de homicídios por 100 mil habitantes" empty={!loading && homicideRateRows.length === 0}>
+                <Bar data={homicideRateData} options={rateBarOptions} />
+              </ChartCard>
+            )}
+          </div>
+          <div className="charts-group-total">
+            TOTAL DE OCORRÊNCIAS: {occurrenceFormatter.format(totalLocationOccurrences)}
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -37,9 +37,65 @@ function normalizeName(name) {
 
 const numberFormatter = new Intl.NumberFormat('pt-BR');
 const decimalFormatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const NEIGHBORHOOD_PALETTE = ['#7c5cff', '#6f8cff', '#5f9dff', '#50adff', '#42bdf2', '#8a63d8', '#756ed9', '#6485e6'];
+
+function escapeTooltipText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]);
+}
+
+function pointOnCircle(radius, angle) {
+  const radians = (angle * Math.PI) / 180;
+  return [42 + Math.cos(radians) * radius, 42 + Math.sin(radians) * radius];
+}
+
+function buildNeighborhoodDonut(rows) {
+  const total = rows.reduce((sum, row) => sum + row.total, 0);
+  if (!rows.length || !total) {
+    return '<div class="crime-tooltip-breakdown-empty">Sem ocorrências nos bairros para estes filtros</div>';
+  }
+
+  let currentAngle = -90;
+  const paths = [];
+
+  rows.forEach((row, index) => {
+    const angle = (row.total / total) * 360;
+    const endAngle = currentAngle + angle;
+    const outerStart = pointOnCircle(38, currentAngle);
+    const outerEnd = pointOnCircle(38, endAngle);
+    const innerEnd = pointOnCircle(21, endAngle);
+    const innerStart = pointOnCircle(21, currentAngle);
+    const largeArc = angle > 180 ? 1 : 0;
+    const color = NEIGHBORHOOD_PALETTE[index % NEIGHBORHOOD_PALETTE.length];
+    paths.push(`<path d="M ${outerStart[0]} ${outerStart[1]} A 38 38 0 ${largeArc} 1 ${outerEnd[0]} ${outerEnd[1]} L ${innerEnd[0]} ${innerEnd[1]} A 21 21 0 ${largeArc} 0 ${innerStart[0]} ${innerStart[1]} Z" fill="${color}"/>`);
+    currentAngle = endAngle;
+  });
+
+  const legend = rows.map((row, index) => `
+    <div class="crime-tooltip-neighborhood-row">
+      <span class="crime-tooltip-neighborhood-swatch" style="background:${NEIGHBORHOOD_PALETTE[index % NEIGHBORHOOD_PALETTE.length]}"></span>
+      <span class="crime-tooltip-neighborhood-name">${escapeTooltipText(row.name)}</span>
+      <span class="crime-tooltip-neighborhood-value">${numberFormatter.format(row.total)}</span>
+    </div>
+  `).join('');
+
+  return `
+    <div class="crime-tooltip-breakdown">
+      <svg class="crime-tooltip-donut" viewBox="0 0 84 84" role="img" aria-label="Ocorrências por bairro">
+        ${paths.join('')}
+      </svg>
+      <div class="crime-tooltip-neighborhoods">${legend}</div>
+    </div>
+  `;
+}
 
 /** Rich HTML content for territory tooltips, styled via the `.crime-tooltip` CSS class. */
-function buildTooltipHtml(title, total, intensity, percentage, homicideRate) {
+function buildTooltipHtml(title, total, intensity, percentage, homicideRate, neighborhoodRows = []) {
   const level = getRiskLevel(intensity);
   const occurrenceWord = total === 1 ? 'ocorrência' : 'ocorrências';
   const percentageHtml =
@@ -50,8 +106,10 @@ function buildTooltipHtml(title, total, intensity, percentage, homicideRate) {
     homicideRate != null
       ? `<div class="crime-tooltip-homicide">Taxa de homicídios: ${decimalFormatter.format(homicideRate)} / 100 mil hab.</div>`
       : '';
+  const breakdownHtml = neighborhoodRows.length ? buildNeighborhoodDonut(neighborhoodRows) : '';
   return `
-    <div class="crime-tooltip-title">${title}</div>
+    <div class="crime-tooltip-title">${escapeTooltipText(title)}</div>
+    ${breakdownHtml}
     <div class="crime-tooltip-row">
       <span class="crime-tooltip-dot" style="background:${level.color}"></span>
       <span class="crime-tooltip-level">${level.label}</span>
@@ -240,12 +298,70 @@ function TerritoryBoundaries({ features, getIntensity, getLabel, onFeatureClick 
           fillOpacity: 0.55,
         }),
         onEachFeature: (feature, layer) => {
+          let scrollFrame = null;
+          let scrollDirection = 1;
+          let lastFrameTime = 0;
+          let pauseUntil = 0;
+          let neighborhoodList = null;
+
+          const stopNeighborhoodScroll = () => {
+            if (scrollFrame != null) cancelAnimationFrame(scrollFrame);
+            scrollFrame = null;
+            neighborhoodList = null;
+            lastFrameTime = 0;
+            pauseUntil = 0;
+          };
+
+          const animateNeighborhoodScroll = (timestamp) => {
+            if (!neighborhoodList?.isConnected) {
+              stopNeighborhoodScroll();
+              return;
+            }
+            const maxScroll = neighborhoodList.scrollHeight - neighborhoodList.clientHeight;
+            if (maxScroll <= 0) {
+              scrollFrame = null;
+              return;
+            }
+            if (timestamp < pauseUntil) {
+              scrollFrame = requestAnimationFrame(animateNeighborhoodScroll);
+              return;
+            }
+            const elapsed = lastFrameTime ? Math.min((timestamp - lastFrameTime) / 1000, 0.05) : 0;
+            lastFrameTime = timestamp;
+            neighborhoodList.scrollTop += scrollDirection * elapsed * 18;
+
+            if (scrollDirection > 0 && neighborhoodList.scrollTop >= maxScroll) {
+              neighborhoodList.scrollTop = maxScroll;
+              scrollDirection = -1;
+              pauseUntil = timestamp + 1200;
+            } else if (scrollDirection < 0 && neighborhoodList.scrollTop <= 0) {
+              neighborhoodList.scrollTop = 0;
+              scrollDirection = 1;
+              pauseUntil = timestamp + 1200;
+            }
+            scrollFrame = requestAnimationFrame(animateNeighborhoodScroll);
+          };
+
+          const startNeighborhoodScroll = () => {
+            const tooltipElement = layer.getTooltip()?.getElement();
+            const list = tooltipElement?.querySelector('.crime-tooltip-neighborhoods');
+            if (list && list === neighborhoodList && scrollFrame != null) return;
+            stopNeighborhoodScroll();
+            neighborhoodList = list ?? null;
+            if (!neighborhoodList || neighborhoodList.scrollHeight <= neighborhoodList.clientHeight) return;
+            scrollDirection = 1;
+            scrollFrame = requestAnimationFrame(animateNeighborhoodScroll);
+          };
+
           layer.bindTooltip(getLabel(feature), {
             sticky: true,
             direction: 'top',
             opacity: 1,
             className: 'crime-tooltip',
           });
+          layer.on('tooltipopen', startNeighborhoodScroll);
+          layer.on('tooltipclose', stopNeighborhoodScroll);
+          layer.on('mouseover', startNeighborhoodScroll);
           layer.on('click', () => {
             onFeatureClick?.(feature);
             // Zoom-on-click is reserved for bairros; município selection is handled by FocusMunicipality.
@@ -264,7 +380,13 @@ function TerritoryBoundaries({ features, getIntensity, getLabel, onFeatureClick 
     ).addTo(map);
 
     return () => {
-      if (layerRef.current) map.removeLayer(layerRef.current);
+      if (layerRef.current) {
+        layerRef.current.eachLayer((layer) => {
+          layer.closeTooltip();
+          layer.off('tooltipclose');
+        });
+        map.removeLayer(layerRef.current);
+      }
     };
   }, [map, features, getIntensity, getLabel, onFeatureClick]);
 
@@ -325,6 +447,7 @@ function HeatMapView({
   const [currentCityId, setCurrentCityId]          = useState(null);
   const [cityStatistics, setCityStatistics]        = useState(EMPTY_STATISTICS);
   const [neighborhoodStatistics, setNeighborhoodStatistics] = useState(EMPTY_STATISTICS);
+  const [neighborhoodStatisticsByCity, setNeighborhoodStatisticsByCity] = useState({});
   const [cityNeighborhoodDirectory, setCityNeighborhoodDirectory] = useState([]);
 
   // Load the Baixada Santista boundary layers once; the browser caches them afterwards.
@@ -367,6 +490,27 @@ function HeatMapView({
     return () => { cancelled = true; };
   }, [filters, cityIds]);
 
+  useEffect(() => {
+    if (!cityIds.length) return undefined;
+    let cancelled = false;
+    setNeighborhoodStatisticsByCity({});
+    Promise.all(cityIds.map(async (ibgeId) => {
+      try {
+        const result = await fetchCrimeStatistics({
+          ...filters,
+          municipalityIds: [String(ibgeId)],
+          neighborhoodIds: [],
+        });
+        return [ibgeId, result.by_location ?? []];
+      } catch {
+        return [ibgeId, []];
+      }
+    })).then((results) => {
+      if (!cancelled) setNeighborhoodStatisticsByCity(Object.fromEntries(results));
+    });
+    return () => { cancelled = true; };
+  }, [filters, cityIds]);
+
   // Neighborhood-level (bairro) crime counts for the focused city — drives high zoom.
   useEffect(() => {
     if (!effectiveCityId) { setNeighborhoodStatistics(EMPTY_STATISTICS); return undefined; }
@@ -401,6 +545,26 @@ function HeatMapView({
     () => new Map(neighborhoodStatistics.by_location.map((row) => [normalizeName(row.name), row])),
     [neighborhoodStatistics]
   );
+  const neighborhoodRowsByCity = useMemo(() => {
+    const rows = new Map();
+    for (const ibgeId of cityIds) {
+      const cityFeatures = neighborhoodFeatures.filter((feature) => feature.properties.ibge_id === ibgeId);
+      const totalsByName = new Map(
+        (neighborhoodStatisticsByCity[ibgeId] ?? []).map((row) => [normalizeName(row.name), row.total])
+      );
+      const uniqueNames = new Map();
+      cityFeatures.forEach((feature) => {
+        const name = feature.properties.neighborhood_name;
+        const normalizedName = normalizeName(name);
+        if (!uniqueNames.has(normalizedName)) uniqueNames.set(normalizedName, name);
+      });
+      rows.set(ibgeId, [...uniqueNames.entries()]
+        .map(([normalizedName, name]) => ({ name, total: totalsByName.get(normalizedName) ?? 0 }))
+        .filter((row) => row.total > 0)
+        .sort((first, second) => second.total - first.total));
+    }
+    return rows;
+  }, [cityIds, neighborhoodFeatures, neighborhoodStatisticsByCity]);
   const neighborhoodTotals = useMemo(
     () => new Map([...neighborhoodStatsByName.entries()].map(([name, row]) => [name, row.total])),
     [neighborhoodStatsByName]
@@ -432,10 +596,11 @@ function HeatMapView({
         total,
         cityMax ? total / cityMax : null,
         row?.percentage ?? null,
-        row?.homicide_rate_per_100k ?? null
+        row?.homicide_rate_per_100k ?? null,
+        neighborhoodRowsByCity.get(feature.properties.ibge_id) ?? []
       );
     },
-    [cityStatsById, cityMax]
+    [cityStatsById, cityMax, neighborhoodRowsByCity]
   );
   const getNeighborhoodLabel = useCallback(
     (feature) => {
@@ -513,12 +678,14 @@ function HeatMapView({
       <div className="legend" aria-label="Legenda de intensidade">
         <span className="legend-title">Níveis de risco</span>
         <div className="legend-items">
-          <span className="legend-item"><span className="legend-color very-low" /><span>Muito baixo</span></span>
-          <span className="legend-item"><span className="legend-color low" /><span>Baixo</span></span>
-          <span className="legend-item"><span className="legend-color medium" /><span>Médio</span></span>
-          <span className="legend-item"><span className="legend-color high" /><span>Alto</span></span>
-          <span className="legend-item"><span className="legend-color very-high" /><span>Muito alto</span></span>
-          <span className="legend-item"><span className="legend-color no-data" /><span>Sem dados</span></span>
+          <span className="legend-color-bar" aria-hidden="true" />
+          <div className="legend-labels">
+            <span>Muito baixo</span>
+            <span>Baixo</span>
+            <span>Médio</span>
+            <span>Alto</span>
+            <span>Muito alto</span>
+          </div>
         </div>
       </div>
 
@@ -542,7 +709,7 @@ function HeatMapView({
 
       {!loading && regionBounds && (
         <MapContainer
-          minZoom={10}
+          minZoom={7}
           maxZoom={17}
           maxBoundsViscosity={1.0}
           scrollWheelZoom

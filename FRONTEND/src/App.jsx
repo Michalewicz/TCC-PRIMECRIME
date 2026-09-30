@@ -10,6 +10,7 @@ function App() {
   const [activePage, setActivePage] = useState('map');
   const [isDark, setIsDark] = useState(true);
   const [selectedBaseLayer, setSelectedBaseLayer] = useState('Mapa Claro');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('light-theme', !isDark);
@@ -89,31 +90,18 @@ function App() {
   ));
 
   return (
-    <div className={`app-shell ${isDark ? 'dark-theme' : 'light-theme'}`}>
+    <div className={`app-shell ${isDark ? 'dark-theme' : 'light-theme'} ${sidebarCollapsed ? 'sidebar-is-collapsed' : ''}`}>
       <Sidebar
         activePage={activePage}
         onPageChange={setActivePage}
         isDark={isDark}
         onToggleTheme={() => setIsDark((current) => !current)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={() => setSidebarCollapsed((current) => !current)}
       />
 
       <main className="app-content">
-      <header className="hero">
-        <div>
-          <h1>
-            {activePage === 'map'
-              ? 'Visualização de Crimes da Baixada Santista - Mapa de Calor'
-              : 'Visualização de Crimes da Baixada Santista - Gráficos'}
-          </h1>
-          <p>
-            {activePage === 'map'
-              ? 'Explore a concentração de ocorrências por cidade e, ao aproximar o mapa, por bairro. Clique em um território para filtrar por ele.'
-              : 'Use os filtros para exibir resultados específicos. Passe o mouse por cima para exibir os valores.'}
-          </p>
-        </div>
-      </header>
-
-      <section className="filters-bar">
+      {activePage !== 'details' && <section className="filters-bar">
         <div className="filters-heading">
           <h2>Filtros</h2>
           <button
@@ -139,7 +127,7 @@ function App() {
         {filtersError && (
           <p className="filter-error">Não foi possível carregar os filtros do servidor.</p>
         )}
-      </section>
+      </section>}
 
       {activePage === 'map' ? (
         <section className="map-section">
@@ -155,16 +143,32 @@ function App() {
           </div>
         </section>
       ) : (
-        <section className="charts-section">
-          <ChartsPanel
-            statistics={statistics}
-            filters={filters}
-            isDark={isDark}
-            loading={statisticsLoading}
-            error={statisticsError}
-          />
-        </section>
+        <>
+          <section className="about-section details-about">
+            <h2>SOBRE O PROJETO</h2>
+            <p>Espaço reservado para apresentar o projeto PrimeCrimes, seus objetivos e o contexto da análise criminal na Baixada Santista.</p>
+          </section>
+          <section className="details-page" aria-label="Detalhes do projeto">
+            <article className="details-card">
+              <h2>METODOLOGIA</h2>
+              <p>Espaço reservado para descrever os critérios de organização, tratamento e análise dos dados.</p>
+            </article>
+            <article className="details-card">
+              <h2>FONTES DE DADOS</h2>
+              <p>Espaço reservado para identificar as fontes, períodos de referência e atualizações dos dados.</p>
+            </article>
+            <article className="details-card">
+              <h2>COBERTURA GEOGRÁFICA</h2>
+              <p>Espaço reservado para detalhar os municípios e bairros representados nas visualizações.</p>
+            </article>
+            <article className="details-card">
+              <h2>LIMITAÇÕES</h2>
+              <p>Espaço reservado para informar limitações, critérios de interpretação e possíveis lacunas dos dados.</p>
+            </article>
+          </section>
+        </>
       )}
+      <footer className="site-footer">PrimeCrimes criado por Rafael Michalewicz e Sandro Gabriel</footer>
       </main>
     </div>
   );

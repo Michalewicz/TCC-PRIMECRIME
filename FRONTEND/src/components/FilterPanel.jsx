@@ -1,7 +1,13 @@
 import MultiSelectDropdown from './MultiSelectDropdown';
+import DateTimePicker from './DateTimePicker';
 
-const MIN_DATA_DATE = '1202-01-18T19:03';
+const MIN_DATA_DATE = '2022-01-01T00:00';
 const MAX_DATA_DATE = '2026-06-30T21:12';
+
+function clampDate(value, minimum, maximum) {
+  if (!value) return '';
+  return value < minimum ? minimum : value > maximum ? maximum : value;
+}
 
 function FilterPanel({
   options,
@@ -69,31 +75,25 @@ function FilterPanel({
         onChange={onNeighborhoodIdsChange}
       />
 
-      <div className="filter-field">
-        <label htmlFor="filter-start-date">Data início</label>
-        <input
-          id="filter-start-date"
-          type="datetime-local"
-          value={startDate}
-          disabled={disabled}
-          min={MIN_DATA_DATE}
-          max={endDate || MAX_DATA_DATE}
-          onChange={(e) => onStartDateChange(e.target.value)}
-        />
-      </div>
+      <DateTimePicker
+        id="filter-start-date"
+        label="DATA INICIAL"
+        value={startDate}
+        disabled={disabled}
+        min={MIN_DATA_DATE}
+        max={endDate || MAX_DATA_DATE}
+        onChange={(nextValue) => onStartDateChange(clampDate(nextValue, MIN_DATA_DATE, endDate || MAX_DATA_DATE))}
+      />
 
-      <div className="filter-field">
-        <label htmlFor="filter-end-date">Data fim</label>
-        <input
-          id="filter-end-date"
-          type="datetime-local"
-          value={endDate}
-          disabled={disabled}
-          min={startDate || MIN_DATA_DATE}
-          max={MAX_DATA_DATE}
-          onChange={(e) => onEndDateChange(e.target.value)}
-        />
-      </div>
+      <DateTimePicker
+        id="filter-end-date"
+        label="DATA FINAL"
+        value={endDate}
+        disabled={disabled}
+        min={startDate || MIN_DATA_DATE}
+        max={MAX_DATA_DATE}
+        onChange={(nextValue) => onEndDateChange(clampDate(nextValue, startDate || MIN_DATA_DATE, MAX_DATA_DATE))}
+      />
     </div>
   );
 }

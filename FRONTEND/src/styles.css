@@ -83,16 +83,52 @@ html.light-theme,
 }
 
 .sidebar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   width: 236px;
   height: 100vh;
+  z-index: 1200;
   display: flex;
   flex-direction: column;
   padding: 28px 16px 20px;
   background: var(--surface-strong);
   border-right: 1px solid var(--border);
   box-shadow: 8px 0 32px var(--shadow);
+  transition: width 180ms ease;
+}
+
+.sidebar-collapse-toggle {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--control-bg);
+  cursor: pointer;
+  transition: transform 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.sidebar-collapse-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.sidebar-collapse-toggle svg {
+  transition: transform 180ms ease;
+}
+
+.sidebar-collapse-toggle.is-collapsed svg {
+  transform: rotate(180deg);
 }
 
 .sidebar-brand {
@@ -134,11 +170,13 @@ html.light-theme,
   line-height: 1.2;
   text-align: center;
   white-space: nowrap;
+  text-transform: uppercase;
 }
 
 .sidebar-nav {
   display: grid;
   gap: 8px;
+  order: 1;
 }
 
 .sidebar-link,
@@ -168,6 +206,10 @@ html.light-theme,
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
+.sidebar-link-label {
+  text-transform: uppercase;
+}
+
 .sidebar-link-icon {
   display: grid;
   place-items: center;
@@ -180,9 +222,12 @@ html.light-theme,
 }
 
 .theme-switcher {
+  order: 2;
   align-self: flex-start;
-  margin-bottom: 28px;
+  margin-top: auto;
+  margin-bottom: 0;
   justify-content: center;
+  align-self: center;
   width: max-content;
   min-height: 48px;
   padding: 11px 14px;
@@ -232,8 +277,52 @@ html.light-theme,
 .app-content {
   width: min(calc(100% - 236px), 1400px);
   min-width: 0;
-  padding: 30px 1px;
-  margin: 0 auto;
+  padding: 10px clamp(8px, 1.5vw, 20px);
+  margin: 0 0 0 max(236px, calc((100% + 236px - 1400px) / 2));
+  transition: width 180ms ease, margin-left 180ms ease;
+}
+
+.sidebar-is-collapsed .sidebar {
+  width: 76px;
+}
+
+.sidebar-is-collapsed .app-content {
+  width: min(calc(100% - 76px), 1400px);
+  margin-left: max(76px, calc((100% + 76px - 1400px) / 2));
+}
+
+.sidebar-is-collapsed .sidebar-brand,
+.sidebar-is-collapsed .sidebar-title,
+.sidebar-is-collapsed .sidebar-link-label {
+  display: none;
+}
+
+.sidebar-is-collapsed .sidebar-collapse-toggle {
+  right: 16px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+}
+
+.sidebar-is-collapsed .sidebar-nav {
+  margin-top: 48px;
+}
+
+.sidebar-is-collapsed .sidebar-link {
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.sidebar-is-collapsed .sidebar-link.is-active {
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.sidebar-is-collapsed .theme-switcher {
+  width: 60px;
+  min-height: 48px;
+  padding: 10px 6px;
 }
 
 .hero {
@@ -258,8 +347,8 @@ html.light-theme,
 .filters-bar {
   border-radius: 20px;
   background: var(--surface);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 18px;
+  margin-bottom: 14px;
 }
 
 .filters-bar h2 {
@@ -271,7 +360,7 @@ html.light-theme,
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .filters-heading h2 {
@@ -303,7 +392,7 @@ html.light-theme,
 
 .map-section {
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 .charts-section {
@@ -311,11 +400,53 @@ html.light-theme,
   margin-top: 20px;
 }
 
+.about-section,
+.details-card {
+  border-radius: 14px;
+  padding: 18px;
+  background: var(--surface);
+}
+
+.about-section {
+  margin-top: 14px;
+}
+
+.about-section h2,
+.details-card h2 {
+  margin: 0 0 8px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.filters-bar h2,
+.about-section h2,
+.details-card h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.about-section p,
+.details-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.details-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.details-about {
+  margin: 0 0 14px;
+}
+
 .panel-info,
 .map-card {
   border-radius: 20px;
   background: var(--surface);
-  padding: 20px;
+  padding: 8px;
 }
 
 .map-wrapper {
@@ -323,8 +454,8 @@ html.light-theme,
 }
 
 .map-view {
-  height: min(78vh, 820px);
-  min-height: 560px;
+  height: clamp(360px, calc(100vh - 330px), 620px);
+  min-height: 360px;
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
@@ -354,52 +485,25 @@ html.light-theme,
 }
 
 .legend-items {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  display: grid;
+  gap: 6px;
 }
 
-.legend-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 44px;
-  text-align: center;
-}
-
-.legend-color {
-  width: 12px;
+.legend-color-bar {
+  display: block;
+  width: 100%;
   height: 12px;
-  border-radius: 50%;
-}
-
-.legend-color.very-low {
-  background: #ffcdd2;
-}
-
-.legend-color.low {
-  background: #ef9a9a;
-}
-
-.legend-color.medium {
-  background: #e53935;
-}
-
-.legend-color.high {
-  background: #b71c1c;
-}
-
-.legend-color.very-high {
-  background: #7f0000;
-}
-
-.legend-color.no-data {
-  background: #9aa4b2;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffcdd2 0%, #ef9a9a 25%, #e53935 50%, #b71c1c 75%, #7f0000 100%);
 }
 
 .legend-labels {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 0.72rem;
+  text-align: center;
+  opacity: 0.9;
 }
 
 .map-loading-overlay {
@@ -451,13 +555,14 @@ html.light-theme,
 
 .leaflet-tooltip.crime-tooltip {
   background: var(--overlay-strong);
-  color: #f5f7fb;
-  border: 1px solid rgba(116, 192, 253, 0.35);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 0.8rem;
   line-height: 1.4;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  max-width: min(370px, calc(100vw - 32px));
 }
 
 .leaflet-tooltip.crime-tooltip.leaflet-tooltip-top::before {
@@ -503,6 +608,83 @@ html.light-theme,
 .crime-tooltip-total {
   opacity: 0.85;
   white-space: nowrap;
+}
+
+.crime-tooltip-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+  padding: 7px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.crime-tooltip-donut {
+  width: 84px;
+  height: 84px;
+  flex: 0 0 84px;
+  color: var(--text);
+  overflow: visible;
+}
+
+.crime-tooltip-donut text {
+  fill: currentColor;
+  font-size: 6px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--overlay-strong);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+.crime-tooltip-neighborhoods {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 100px;
+  min-width: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.crime-tooltip-neighborhoods::-webkit-scrollbar {
+  display: none;
+}
+
+.crime-tooltip-neighborhood-row {
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  min-height: 15px;
+  font-size: 0.66rem;
+  line-height: 1.2;
+}
+
+.crime-tooltip-neighborhood-swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.crime-tooltip-neighborhood-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.crime-tooltip-neighborhood-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.crime-tooltip-breakdown-empty {
+  margin: 6px 0;
+  color: var(--muted);
+  font-size: 0.68rem;
 }
 
 .crime-tooltip-percentage,
@@ -639,6 +821,31 @@ html.light-theme,
   background: var(--surface-hover);
 }
 
+.multi-select-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 5px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.multi-select-select-all {
+  padding: 6px 4px;
+  border: 0;
+  color: var(--accent);
+  background: none;
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.multi-select-select-all:hover {
+  text-decoration: underline;
+}
+
 .multi-select-option input[type='checkbox'] {
   appearance: none;
   width: 16px;
@@ -709,6 +916,280 @@ html.light-theme,
   color: var(--text);
 }
 
+.date-picker {
+  position: relative;
+}
+
+.date-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  padding: 8px 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  background: var(--control-bg);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 20px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.date-picker-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.date-picker-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.date-picker-icon {
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.date-picker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1200;
+  width: min(338px, calc(100vw - 24px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  background: var(--surface-strong);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.date-picker-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 118px;
+  min-height: 278px;
+}
+
+.date-picker-calendar {
+  position: relative;
+  min-width: 0;
+  padding: 12px 10px 38px;
+  border-right: 1px solid var(--border);
+}
+
+.date-picker-month-title,
+.date-picker-navigation button,
+.date-picker-year,
+.date-picker-months button,
+.date-picker-days button,
+.date-picker-time-list button,
+.date-picker-clear,
+.date-picker-apply {
+  border: 0;
+  color: var(--text);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.date-picker-month-title {
+  display: block;
+  width: 100%;
+  padding: 0 0 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: left;
+  text-transform: lowercase;
+}
+
+.date-picker-month-title span {
+  color: var(--muted);
+}
+
+.date-picker-navigation {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.date-picker-navigation button {
+  width: 24px;
+  height: 24px;
+  color: var(--muted);
+  font-size: 1.35rem;
+  line-height: 20px;
+}
+
+.date-picker-navigation button:disabled {
+  color: var(--text);
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.date-picker-weekdays,
+.date-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.date-picker-weekdays {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.date-picker-days button {
+  min-width: 24px;
+  height: 28px;
+  border-radius: 2px;
+  font-size: 0.72rem;
+}
+
+.date-picker-days button:hover:not(:disabled),
+.date-picker-months button:hover:not(:disabled),
+.date-picker-time-list button:hover {
+  background: var(--surface-hover);
+}
+
+.date-picker-days button:disabled,
+.date-picker-months button:disabled {
+  color: var(--muted);
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.date-picker-days button.is-selected,
+.date-picker-months button.is-selected,
+.date-picker-time-list button.is-selected {
+  color: var(--accent);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.date-picker-years {
+  max-height: 210px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.date-picker-year-row {
+  border-bottom: 1px solid var(--border);
+}
+
+.date-picker-year {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  text-align: left;
+}
+
+.date-picker-months {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  padding: 3px 0 7px;
+}
+
+.date-picker-months button {
+  padding: 6px 2px;
+  border-radius: 2px;
+  font-size: 0.72rem;
+  text-transform: lowercase;
+}
+
+.date-picker-time {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 12px 6px;
+}
+
+.date-picker-time-list {
+  height: 254px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.date-picker-time-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.date-picker-time-list::-webkit-scrollbar-thumb {
+  border: 1px solid var(--surface-strong);
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.date-picker-years::-webkit-scrollbar {
+  width: 3px;
+}
+
+.date-picker-years::-webkit-scrollbar-thumb {
+  border: 1px solid var(--surface-strong);
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.date-picker-time-list button {
+  display: block;
+  width: 100%;
+  height: 32px;
+  border-radius: 2px;
+  font-size: 0.76rem;
+  scroll-snap-align: start;
+}
+
+.date-picker-time-list:first-child {
+  direction: rtl;
+}
+
+.date-picker-time-list:first-child button {
+  direction: ltr;
+}
+
+.date-picker-clear {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  padding: 4px 0;
+  color: #ff6b35;
+  font-size: 0.78rem;
+}
+
+.date-picker-clear:hover {
+  color: #ff8a60;
+  text-decoration: underline;
+}
+
+.date-picker-apply {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 0 10px 10px;
+  padding: 7px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  background: var(--surface-hover);
+  font-size: 0.78rem;
+}
+
 .multi-select-empty {
   color: var(--muted);
   font-size: 0.8rem;
@@ -717,7 +1198,7 @@ html.light-theme,
 }
 
 .multi-select-clear {
-  margin: 0 0 6px;
+  margin: 0;
   background: none;
   border: none;
   color: #ff6b35;
@@ -745,21 +1226,66 @@ html.light-theme,
 
 .charts-panel {
   width: 100%;
-  border-radius: 20px;
+  padding: 0;
+}
+
+.charts-group {
+  padding: 18px;
+  border-radius: 14px;
   background: var(--surface);
-  padding: 20px;
+}
+
+.charts-group + .charts-group {
+  margin-top: 22px;
+}
+
+.chart-card h3,
+.filters-bar h2,
+.legend-title {
+  text-transform: uppercase;
+}
+
+.site-footer {
+  padding: 26px 0 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .charts-summary {
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.charts-summary h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.charts-summary strong {
+  color: #32a9d6;
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
 }
 
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 28px;
+}
+
+.charts-group .charts-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (min-width: 1101px) {
@@ -773,6 +1299,12 @@ html.light-theme,
   font-size: 0.95rem;
 }
 
+.chart-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
 .month-chart {
   width: 100%;
   justify-self: end;
@@ -780,8 +1312,33 @@ html.light-theme,
 
 .chart-canvas {
   position: relative;
+  width: 100%;
   height: 340px;
   min-height: 340px;
+}
+
+.charts-group-total {
+  align-self: flex-end;
+  width: 100%;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: #32a9d6;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+  .charts-summary h2 {
+    font-size: 1.4rem;
+  }
+
+  .charts-summary strong {
+    font-size: 2.8rem;
+  }
 }
 
 .crime-type-chart .chart-canvas {
@@ -820,6 +1377,29 @@ html.light-theme,
 
   .sidebar {
     width: 190px;
+  }
+
+  .app-content {
+    width: calc(100% - 190px);
+    margin-left: 190px;
+    padding: 18px 10px;
+  }
+
+  .sidebar-is-collapsed .sidebar {
+    width: 76px;
+  }
+
+  .sidebar-is-collapsed .app-content {
+    width: calc(100% - 76px);
+    margin-left: 76px;
+  }
+
+  .charts-group .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-page {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -868,6 +1448,17 @@ html.light-theme,
   .app-content {
     width: 100%;
     margin: 0;
+  }
+
+  .sidebar-is-collapsed .sidebar {
+    position: fixed;
+    width: 76px;
+    height: 100vh;
+  }
+
+  .sidebar-is-collapsed .app-content {
+    width: calc(100% - 76px);
+    margin-left: 76px;
   }
 
   .charts-grid {
