@@ -5,6 +5,7 @@ class CrimeTypeOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     crime_type: str
+    severity: str
 
 
 class CrimeTypeCount(BaseModel):

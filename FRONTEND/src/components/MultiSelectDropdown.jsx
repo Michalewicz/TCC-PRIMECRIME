@@ -27,12 +27,6 @@ function MultiSelectDropdown({ id, label, placeholder, options, values, disabled
     onChange(next);
   };
 
-  const selectAll = () => {
-    onChange([...new Set(options.map(({ value }) => String(value)))]);
-  };
-
-  const allSelected = options.length > 0 && values.length === options.length;
-
   const summary =
     values.length === 0
       ? placeholder
@@ -58,18 +52,13 @@ function MultiSelectDropdown({ id, label, placeholder, options, values, disabled
 
       {open && (
         <div className="multi-select-panel" role="listbox">
-          <div className="multi-select-actions">
-            {!allSelected && options.length > 0 && (
-              <button type="button" className="multi-select-select-all" onClick={selectAll}>
-                Selecionar tudo
-              </button>
-            )}
-            {values.length > 0 && (
+          {values.length > 0 && (
+            <div className="multi-select-actions">
               <button type="button" className="multi-select-clear" onClick={() => onChange([])}>
                 Limpar
               </button>
-            )}
-          </div>
+            </div>
+          )}
           {options.length === 0 && <p className="multi-select-empty">Nenhuma opção disponível</p>}
           {options.map(({ value, label: optionLabel }) => {
             const stringValue = String(value);

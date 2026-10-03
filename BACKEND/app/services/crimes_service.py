@@ -22,8 +22,8 @@ class CrimesService:
         self._municipalities_repository = municipalities_repository
 
     async def list_crime_types(self) -> list[CrimeTypeOut]:
-        crime_types = await self._crimes_repository.list_crime_types()
-        return [CrimeTypeOut(crime_type=crime_type) for crime_type in crime_types]
+        rows = await self._crimes_repository.list_crime_types()
+        return [CrimeTypeOut(**row) for row in rows]
 
     async def list_severities(self) -> list[SeverityOut]:
         severities = await self._crimes_repository.list_severities()

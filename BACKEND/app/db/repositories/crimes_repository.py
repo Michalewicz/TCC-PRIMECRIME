@@ -16,13 +16,16 @@ class CrimesRepository:
     def __init__(self, pool: aiomysql.Pool):
         self._pool = pool
 
-    async def list_crime_types(self) -> list[str]:
-        query = "SELECT DISTINCT crime_type FROM crimes ORDER BY crime_type"
+    async def list_crime_types(self) -> list[dict]:
+        # Each crime type maps to a single severity (see SCRIPTS/extract.py); MIN keeps the query valid under ONLY_FULL_GROUP_BY.
+        query = (
+            "SELECT crime_type, MIN(severity) AS severity "
+            "FROM crimes GROUP BY crime_type ORDER BY crime_type"
+        )
         async with self._pool.acquire() as connection:
-            async with connection.cursor() as cursor:
+            async with connection.cursor(aiomysql.DictCursor) as cursor:
                 await cursor.execute(query)
-                rows = await cursor.fetchall()
-        return [row[0] for row in rows]
+                return await cursor.fetchall()
 
     async def list_severities(self) -> list[str]:
         query = "SELECT DISTINCT severity FROM crimes ORDER BY severity"

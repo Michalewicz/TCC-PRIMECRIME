@@ -1,15 +1,28 @@
-import { ArrowLeft, BarChart3, ClipboardList, MapPinned, Moon, Sun } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { BarChart3, ChevronLeft, ClipboardList, MapPinned, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { ROUTES } from '../router/routes';
 
-function Sidebar({ activePage, onPageChange, isDark, onToggleTheme, collapsed, onToggleCollapsed }) {
+const NAV_ITEMS = [
+  { to: ROUTES.map, label: 'Mapa de Calor', Icon: MapPinned },
+  { to: ROUTES.charts, label: 'Gráficos', Icon: BarChart3 },
+  { to: ROUTES.details, label: 'Detalhes', Icon: ClipboardList },
+];
+
+function Sidebar({ collapsed, onToggleCollapsed }) {
+  const { isDark, toggleTheme } = useTheme();
+
   return (
-    <aside className={`sidebar ${collapsed ? 'is-collapsed' : ''}`} aria-label="Navegacao principal">
+    <aside id="app-sidebar" className={`sidebar ${collapsed ? 'is-collapsed' : ''}`} aria-label="Navegação principal">
       <button
         type="button"
         className={`sidebar-collapse-toggle ${collapsed ? 'is-collapsed' : ''}`}
         onClick={onToggleCollapsed}
         aria-label={collapsed ? 'Expandir barra lateral' : 'Recolher barra lateral'}
+        aria-expanded={!collapsed}
+        aria-controls="app-sidebar"
       >
-        <ArrowLeft size={18} />
+        <ChevronLeft size={18} strokeWidth={2.4} />
       </button>
 
       <div className="sidebar-brand">
@@ -21,7 +34,7 @@ function Sidebar({ activePage, onPageChange, isDark, onToggleTheme, collapsed, o
       <button
         type="button"
         className="theme-switcher"
-        onClick={onToggleTheme}
+        onClick={toggleTheme}
         aria-label={`Ativar modo ${isDark ? 'claro' : 'escuro'}`}
         aria-pressed={!isDark}
       >
@@ -32,34 +45,19 @@ function Sidebar({ activePage, onPageChange, isDark, onToggleTheme, collapsed, o
         </span>
       </button>
 
-      <nav className="sidebar-nav" aria-label="Paginas">
-        <button
-          type="button"
-          className={`sidebar-link ${activePage === 'map' ? 'is-active' : ''}`}
-          onClick={() => onPageChange('map')}
-          aria-current={activePage === 'map' ? 'page' : undefined}
-        >
-          <span className="sidebar-link-icon" aria-hidden="true"><MapPinned size={17} strokeWidth={2.2} /></span>
-          <span className="sidebar-link-label">Mapa de Calor</span>
-        </button>
-        <button
-          type="button"
-          className={`sidebar-link ${activePage === 'charts' ? 'is-active' : ''}`}
-          onClick={() => onPageChange('charts')}
-          aria-current={activePage === 'charts' ? 'page' : undefined}
-        >
-          <span className="sidebar-link-icon" aria-hidden="true"><BarChart3 size={17} strokeWidth={2.2} /></span>
-          <span className="sidebar-link-label">Graficos</span>
-        </button>
-        <button
-          type="button"
-          className={`sidebar-link ${activePage === 'details' ? 'is-active' : ''}`}
-          onClick={() => onPageChange('details')}
-          aria-current={activePage === 'details' ? 'page' : undefined}
-        >
-          <span className="sidebar-link-icon" aria-hidden="true"><ClipboardList size={17} strokeWidth={2.2} /></span>
-          <span className="sidebar-link-label">Detalhes</span>
-        </button>
+      <nav className="sidebar-nav" aria-label="Páginas">
+        {NAV_ITEMS.map(({ to, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            aria-label={label}
+            title={collapsed ? label : undefined}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'is-active' : ''}`}
+          >
+            <span className="sidebar-link-icon" aria-hidden="true"><Icon size={17} strokeWidth={2.2} /></span>
+            <span className="sidebar-link-label">{label}</span>
+          </NavLink>
+        ))}
       </nav>
     </aside>
   );

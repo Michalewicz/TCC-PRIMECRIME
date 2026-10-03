@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchCrimeTypes, fetchMunicipalities, fetchNeighborhoods, fetchSeverities } from '../config/api';
 
 /**
@@ -62,6 +62,19 @@ export function useCrimeFilters() {
     [crimeTypes, severities, municipalityIds, neighborhoodIds, startDate, endDate]
   );
 
+  const activeFilterCount = Object.values(filters).filter((value) => (
+    Array.isArray(value) ? value.length > 0 : Boolean(value)
+  )).length;
+
+  const clearAll = useCallback(() => {
+    setCrimeTypes([]);
+    setSeverities([]);
+    setMunicipalityIds([]);
+    setNeighborhoodIds([]);
+    setStartDate('');
+    setEndDate('');
+  }, []);
+
   return {
     options: { crimeTypes: crimeTypeOptions, severities: severityOptions, municipalities, neighborhoods },
     filters,
@@ -71,6 +84,9 @@ export function useCrimeFilters() {
     setNeighborhoodIds,
     setStartDate,
     setEndDate,
+    clearAll,
+    activeFilterCount,
+    hasActiveFilters: activeFilterCount > 0,
     loading,
     error,
   };

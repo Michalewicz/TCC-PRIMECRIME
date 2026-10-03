@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
-  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   --page-bg: #0E1836;
@@ -100,27 +101,33 @@ html.light-theme,
 
 .sidebar-collapse-toggle {
   position: absolute;
-  top: 14px;
-  right: 12px;
+  top: 22px;
+  right: -16px;
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 50%;
   color: var(--muted);
-  background: var(--control-bg);
+  background: var(--surface-strong);
+  box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
-  transition: transform 180ms ease, color 180ms ease, border-color 180ms ease;
+  transition: color 180ms ease, border-color 180ms ease;
 }
 
 .sidebar-collapse-toggle:hover {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.sidebar-collapse-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .sidebar-collapse-toggle svg {
@@ -192,6 +199,7 @@ html.light-theme,
   background: transparent;
   font: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -297,15 +305,6 @@ html.light-theme,
   display: none;
 }
 
-.sidebar-is-collapsed .sidebar-collapse-toggle {
-  right: 16px;
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  min-height: 44px;
-  border-radius: 10px;
-}
-
 .sidebar-is-collapsed .sidebar-nav {
   margin-top: 48px;
 }
@@ -365,6 +364,79 @@ html.light-theme,
 
 .filters-heading h2 {
   margin: 0;
+}
+
+.filters-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.filters-active-count {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--surface-hover);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filters-collapse-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters-collapse-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.filters-collapse-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filters-bar.is-collapsed {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.filters-bar.is-collapsed .filters-heading {
+  margin-bottom: 0;
+}
+
+/* Narrow screens keep the bar in the normal flow: it is too tall to pin. */
+@media (min-width: 901px) {
+  .filters-bar.is-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-top: -10px;
+    padding-top: 28px;
+    border-radius: 0 0 20px 20px;
+    background: var(--surface-strong);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px var(--shadow);
+  }
+
+  .filters-bar.is-sticky.is-collapsed {
+    padding-top: 22px;
+  }
 }
 
 .clear-all-filters {
@@ -824,26 +896,11 @@ html.light-theme,
 .multi-select-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   padding: 0 4px 5px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 4px;
-}
-
-.multi-select-select-all {
-  padding: 6px 4px;
-  border: 0;
-  color: var(--accent);
-  background: none;
-  font: inherit;
-  font-size: 0.78rem;
-  text-align: left;
-  cursor: pointer;
-}
-
-.multi-select-select-all:hover {
-  text-decoration: underline;
 }
 
 .multi-select-option input[type='checkbox'] {
@@ -1351,6 +1408,94 @@ html.light-theme,
   min-height: 440px;
 }
 
+.doughnut-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.doughnut-canvas {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.chart-legend {
+  flex: 0 1 44%;
+  align-self: center;
+  min-width: 140px;
+  max-width: 280px;
+  max-height: 100%;
+  margin: 0;
+  padding: 0 4px 0 0;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.chart-legend-group {
+  padding: 8px 6px 2px;
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chart-legend-group:first-child {
+  padding-top: 0;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text);
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chart-legend-item:hover,
+.chart-legend-item:focus-visible {
+  background: var(--surface-hover);
+}
+
+.chart-legend-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.chart-legend-item.is-hidden {
+  opacity: 0.45;
+}
+
+.chart-legend-item.is-hidden .chart-legend-label {
+  text-decoration: line-through;
+}
+
+.chart-legend-swatch {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.chart-legend-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .chart-empty {
   display: flex;
   align-items: center;
@@ -1423,6 +1568,16 @@ html.light-theme,
     margin: 0 auto 14px;
   }
 
+  .sidebar-collapse-toggle {
+    top: 14px;
+    right: 14px;
+  }
+
+  .sidebar-is-collapsed .sidebar-collapse-toggle {
+    top: 22px;
+    right: -16px;
+  }
+
   .sidebar-title {
     margin: -4px 0 14px;
     font-size: 1rem;
@@ -1435,6 +1590,10 @@ html.light-theme,
 
   .sidebar-nav {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .sidebar-is-collapsed .sidebar-nav {
+    grid-template-columns: 1fr;
   }
 
   .theme-switcher {
@@ -1483,6 +1642,16 @@ html.light-theme,
   .doughnut-chart .chart-canvas {
     height: 380px;
     min-height: 380px;
+  }
+
+  .doughnut-layout {
+    flex-direction: column;
+  }
+
+  .chart-legend {
+    flex: 0 0 38%;
+    align-self: stretch;
+    max-width: none;
   }
 
   .month-chart {
