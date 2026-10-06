@@ -74,6 +74,17 @@ function normalizeKey(value) {
     .toUpperCase();
 }
 
+const SEVERITY_ORDER = Object.keys(SEVERITY_PALETTES);
+
+/** Orders severities as in the palette table (unknown ones last) so each colour family stays contiguous. */
+export function compareBySeverity(first, second) {
+  const rank = (severity) => {
+    const index = SEVERITY_ORDER.indexOf(normalizeKey(severity));
+    return index === -1 ? SEVERITY_ORDER.length : index;
+  };
+  return rank(first) - rank(second);
+}
+
 /** Spreads `count` items across the palette so same-severity crime types stay easy to tell apart. */
 function paletteIndex(position, count, paletteLength) {
   if (count <= 1) return Math.floor((paletteLength - 1) / 2);

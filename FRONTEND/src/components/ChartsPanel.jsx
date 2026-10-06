@@ -4,7 +4,7 @@ import './charts/chartSetup';
 import ChartCard from './charts/ChartCard';
 import DoughnutChart from './charts/DoughnutChart';
 import { useTheme } from '../contexts/ThemeContext';
-import { buildCrimeTypeStyles, getCategoryColors, UNKNOWN_CRIME_TYPE_STYLE } from '../utils/chartColors';
+import { buildCrimeTypeStyles, compareBySeverity, getCategoryColors, UNKNOWN_CRIME_TYPE_STYLE } from '../utils/chartColors';
 import {
   createCrimeTypeBarOptions,
   createLocationBarOptions,
@@ -19,6 +19,8 @@ function locationChartTitle(filters) {
   return filters.municipalityIds.length > 0 ? 'Ocorrências por bairro' : 'Ocorrências por município (top 15)';
 }
 
+const OTHERS_SLICE_COLOR = '#677689';
+
 const sumTotals = (rows) => rows.reduce((sum, row) => sum + row.total, 0);
 
 /** `crimeTypes` is the catalog ({ crime_type, severity }[]) that drives the colour of each crime type. */
@@ -32,15 +34,18 @@ function ChartsPanel({ statistics, filters, crimeTypes, loading, error }) {
   const totalCrimeTypeOccurrences = sumTotals(byCrimeType);
   const totalLocationOccurrences = sumTotals(byLocation);
 
-  // ── Crime types: coloured by severity ──
-  const crimeTypeRows = useMemo(() => byCrimeType.map((row) => ({
-    ...row,
-    ...(crimeTypeStyles.get(row.crime_type) ?? UNKNOWN_CRIME_TYPE_STYLE),
-  })), [byCrimeType, crimeTypeStyles]);
+  // ── Crime types: coloured by severity, so same-severity types sit side by side ──
+  const crimeTypeRows = useMemo(() => byCrimeType
+    .map((row) => ({
+      ...row,
+      ...(crimeTypeStyles.get(row.crime_type) ?? UNKNOWN_CRIME_TYPE_STYLE),
+    }))
+    .sort((first, second) => compareBySeverity(first.severity, second.severity) || second.total - first.total),
+  [byCrimeType, crimeTypeStyles]);
 
   const crimeTypeSlices = useMemo(() => crimeTypeRows.map((row) => ({
     label: row.crime_type,
-    size: Math.log10(row.total + 1),
+    size: row.total,
     value: row.total,
     color: row.color,
     group: row.severity,
@@ -79,13 +84,27 @@ function ChartsPanel({ statistics, filters, crimeTypes, loading, error }) {
   // ── Locations (municípios / bairros) ──
   const locationColors = useMemo(() => getCategoryColors(byLocation.map((row) => row.name)), [byLocation]);
 
-  const locationSlices = useMemo(() => byLocation.map((row, index) => ({
-    label: row.name,
-    size: row.total,
-    value: row.total,
-    percentage: row.percentage ?? 0,
-    color: locationColors[index],
-  })), [byLocation, locationColors]);
+  // The list may be capped (top 15): the remainder gets its own slice so arcs match the real shares.
+  const locationSlices = useMemo(() => {
+    const slices = byLocation.map((row, index) => ({
+      label: row.name,
+      size: row.total,
+      value: row.total,
+      percentage: row.percentage ?? 0,
+      color: locationColors[index],
+    }));
+    const remainder = total - totalLocationOccurrences;
+    if (remainder > 0 && total > 0) {
+      slices.push({
+        label: 'Demais',
+        size: remainder,
+        value: remainder,
+        percentage: (remainder / total) * 100,
+        color: OTHERS_SLICE_COLOR,
+      });
+    }
+    return slices;
+  }, [byLocation, locationColors, total, totalLocationOccurrences]);
 
   const locationData = useMemo(() => ({
     labels: byLocation.map((row) => row.name),

@@ -101,28 +101,27 @@ html.light-theme,
 
 .sidebar-collapse-toggle {
   position: absolute;
-  top: 22px;
-  right: -16px;
+  top: 50%;
+  right: -21px;
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 50%;
+  width: 22px;
+  min-width: 22px;
+  height: 56px;
+  min-height: 56px;
+  padding: 0 0 0 2px;
+  border: none;
+  border-radius: 0 10px 10px 0;
+  transform: translateY(-50%);
   color: var(--muted);
   background: var(--surface-strong);
-  box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
-  transition: color 180ms ease, border-color 180ms ease;
+  transition: color 180ms ease;
 }
 
 .sidebar-collapse-toggle:hover {
   color: var(--accent);
-  border-color: var(--accent);
 }
 
 .sidebar-collapse-toggle:focus-visible {
@@ -299,14 +298,21 @@ html.light-theme,
   margin-left: max(76px, calc((100% + 76px - 1400px) / 2));
 }
 
-.sidebar-is-collapsed .sidebar-brand,
 .sidebar-is-collapsed .sidebar-title,
 .sidebar-is-collapsed .sidebar-link-label {
   display: none;
 }
 
-.sidebar-is-collapsed .sidebar-nav {
-  margin-top: 48px;
+.sidebar-is-collapsed .sidebar-brand {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 20px;
+}
+
+.sidebar-is-collapsed .brand-logo,
+.sidebar-is-collapsed .brand-mark-ring {
+  width: 32px;
+  height: 32px;
 }
 
 .sidebar-is-collapsed .sidebar-link {
@@ -625,6 +631,10 @@ html.light-theme,
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
+.leaflet-tooltip.crime-tooltip.is-lingering {
+  pointer-events: auto;
+}
+
 .leaflet-tooltip.crime-tooltip {
   background: var(--overlay-strong);
   color: var(--text);
@@ -702,12 +712,34 @@ html.light-theme,
 
 .crime-tooltip-donut text {
   fill: currentColor;
-  font-size: 6px;
+  font-size: 5px;
   font-weight: 700;
+  pointer-events: none;
   paint-order: stroke;
   stroke: var(--overlay-strong);
-  stroke-width: 1.5px;
+  stroke-width: 1.2px;
   stroke-linejoin: round;
+}
+
+.crime-tooltip-donut text.crime-tooltip-donut-centre {
+  font-size: 8px;
+  stroke: none;
+}
+
+.crime-tooltip-donut text.crime-tooltip-donut-sub {
+  font-size: 5px;
+  font-weight: 500;
+  stroke: none;
+  opacity: 0.75;
+}
+
+.crime-tooltip-slice {
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.crime-tooltip-breakdown.has-focus .crime-tooltip-slice:not(.is-active) {
+  opacity: 0.4;
 }
 
 .crime-tooltip-neighborhoods {
@@ -715,15 +747,26 @@ html.light-theme,
   flex: 1 1 auto;
   flex-direction: column;
   gap: 2px;
-  max-height: 100px;
+  max-height: 104px;
   min-width: 0;
+  padding-right: 4px;
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
 }
 
 .crime-tooltip-neighborhoods::-webkit-scrollbar {
-  display: none;
+  width: 5px;
+}
+
+.crime-tooltip-neighborhoods::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.crime-tooltip-neighborhoods::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border: none;
+  border-radius: 999px;
 }
 
 .crime-tooltip-neighborhood-row {
@@ -732,8 +775,26 @@ html.light-theme,
   align-items: center;
   gap: 4px;
   min-height: 15px;
+  padding: 0 3px;
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
   font-size: 0.66rem;
   line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.crime-tooltip-neighborhood-row.is-active,
+.crime-tooltip-neighborhood-row:hover {
+  background: var(--surface-hover);
+}
+
+.crime-tooltip-neighborhood-row.is-hidden {
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .crime-tooltip-neighborhood-swatch {
@@ -1571,11 +1632,27 @@ html.light-theme,
   .sidebar-collapse-toggle {
     top: 14px;
     right: 14px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    transform: none;
   }
 
   .sidebar-is-collapsed .sidebar-collapse-toggle {
-    top: 22px;
-    right: -16px;
+    top: 50%;
+    right: -21px;
+    width: 22px;
+    min-width: 22px;
+    height: 56px;
+    min-height: 56px;
+    padding: 0 0 0 2px;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    transform: translateY(-50%);
   }
 
   .sidebar-title {
