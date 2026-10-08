@@ -15,7 +15,7 @@ const NEIGHBORHOODS_GEOJSON_URL = '/baixada-santista-neighborhoods.geojson';
 
 /** Zoom level at which the map switches from municipalities to neighborhoods (bairros) */
 const NEIGHBORHOOD_ZOOM = 12;
-const TOOLTIP_LINGER_MS = 2000;
+const TOOLTIP_LINGER_MS = 500;
 
 const EMPTY_STATISTICS = { total: 0, by_crime_type: [], by_month: [], by_location: [] };
 
