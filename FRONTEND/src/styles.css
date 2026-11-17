@@ -483,6 +483,7 @@ html.light-theme,
   border-radius: 14px;
   padding: 18px;
   background: var(--surface);
+  font-size: 0.9rem;
 }
 
 .about-section {
@@ -493,7 +494,6 @@ html.light-theme,
 .details-card h2 {
   margin: 0 0 8px;
   color: var(--accent);
-  text-transform: uppercase;
 }
 
 .filters-bar h2,
@@ -501,6 +501,11 @@ html.light-theme,
 .details-card h2 {
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+.details-about h2,
+.details-card h2 {
+  text-transform: uppercase;
 }
 
 .about-section p,
@@ -516,8 +521,30 @@ html.light-theme,
   gap: 14px;
 }
 
+.details-about,
+.details-page,
+.details-about *,
+.details-page * {
+  font-family: inherit;
+}
+
 .details-about {
   margin: 0 0 14px;
+  text-align: center;
+}
+
+@media (min-width: 901px) {
+  .details-about {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-top: -10px;
+    padding-top: 28px;
+    border-radius: 0 0 14px 14px;
+    background: var(--surface-strong);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px var(--shadow);
+  }
 }
 
 .panel-info,
