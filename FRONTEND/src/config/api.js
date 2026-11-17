@@ -9,19 +9,19 @@ async function getJson(path) {
 }
 
 export function fetchCrimeTypes() {
-  return getJson('/api/crime-types');
+  return getJson('api/crime-types');
 }
 
 export function fetchSeverities() {
-  return getJson('/api/severities');
+  return getJson('api/severities');
 }
 
 export function fetchMunicipalities() {
-  return getJson('/api/municipalities');
+  return getJson('api/municipalities');
 }
 
 export function fetchNeighborhoods(ibgeId) {
-  return getJson(`/api/municipalities/${ibgeId}/neighborhoods`);
+  return getJson(`api/municipalities/${ibgeId}/neighborhoods`);
 }
 
 export function fetchCrimeStatistics({ crimeTypes, municipalityIds, neighborhoodIds, severities, startDate, endDate } = {}) {
@@ -34,5 +34,5 @@ export function fetchCrimeStatistics({ crimeTypes, municipalityIds, neighborhood
   if (endDate) params.set('end_date', endDate);
 
   const query = params.toString();
-  return getJson(`/api/crimes/statistics${query ? `?${query}` : ''}`);
+  return getJson(`api/crimes/statistics${query ? `?${query}` : ''}`);
 }
