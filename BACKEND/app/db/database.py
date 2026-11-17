@@ -1,3 +1,5 @@
+import ssl
+
 import aiomysql
 
 from app.config import get_settings
@@ -14,6 +16,7 @@ async def init_db_pool() -> aiomysql.Pool:
         user=settings.db_user,
         password=settings.db_password,
         db=settings.db_name,
+        ssl=ssl.create_default_context(cafile=settings.ca_path),
         minsize=settings.db_pool_minsize,
         maxsize=settings.db_pool_maxsize,
         autocommit=True,
