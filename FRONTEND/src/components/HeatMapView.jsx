@@ -704,7 +704,7 @@ function HeatMapView({
     <div className="map-wrapper">
       {/* ── Legend ── */}
       <div className="legend" aria-label="Legenda de intensidade">
-        <span className="legend-title">Níveis de risco</span>
+        <span className="legend-title">Níveis de Intensidade</span>
         <div className="legend-items">
           <span className="legend-color-bar" aria-hidden="true" />
           <div className="legend-labels">
