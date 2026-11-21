@@ -4,7 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { ROUTES } from '../router/routes';
 
 const NAV_ITEMS = [
-  { to: ROUTES.map, label: 'Mapa de Calor', Icon: MapPinned },
+  { to: ROUTES.map, label: 'Mapa', Icon: MapPinned },
   { to: ROUTES.charts, label: 'Gráficos', Icon: BarChart3 },
   { to: ROUTES.details, label: 'Detalhes', Icon: ClipboardList },
 ];

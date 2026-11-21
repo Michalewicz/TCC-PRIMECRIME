@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     db_name: str
     db_pool_minsize: int = 1
     db_pool_maxsize: int = 10
+    ca_path: str
     cors_origins: list[str] = ["http://localhost:3000"]
     host: str = "0.0.0.0"
     port: int = 8000
