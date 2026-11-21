@@ -1,10 +1,13 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
 async function getJson(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`);
+  const url = `${API_BASE_URL.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+  const response = await fetch(url);
+
   if (!response.ok) {
     throw new Error(`Request to ${path} failed with status ${response.status}`);
   }
+
   return response.json();
 }
 
